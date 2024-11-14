@@ -37,3 +37,7 @@
 .video-player {
   @apply object-cover w-full h-full;
 }
+
+.signup-link {
+  @apply underline focus:bg-slate-600 focus:text-white focus:rounded-lg hover:font-extrabold;
+}

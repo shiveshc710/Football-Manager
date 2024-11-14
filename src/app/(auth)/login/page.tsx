@@ -41,6 +41,14 @@ export default function Login() {
                 />
               </div>
 
+              {/* Sign Up Section */}
+              <div className="login-row">
+                <label className="w-55 mr-40">Don't have an account?</label>
+                <a href="/signup" className="signup-link">
+                  Sign Up
+                </a>
+              </div>
+
               {/* Button Section */}
               <button type="submit" className="button">
                 Login
