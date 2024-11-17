@@ -1,20 +1,13 @@
 import "./login.css";
 import "../../globals.css";
-import { VIDEO_URLS } from "../../constantURLs";
+import Link from "next/link";
+import LoginBackground from "../../../components/background/loginBackground";
 
 export default function Login() {
   return (
     <>
       <div className="login-background">
-        <div className="video-section">
-          <video
-            className="video-player"
-            autoPlay
-            muted
-            loop
-            src={VIDEO_URLS.backgroundVideo}
-          />
-        </div>
+        <LoginBackground />
 
         <div className="login-container">
           <h1 className="fm-heading">Football Manager</h1>
@@ -44,9 +37,9 @@ export default function Login() {
               {/* Sign Up Section */}
               <div className="login-row">
                 <label className="w-55 mr-40">Don't have an account?</label>
-                <a href="/signup" className="signup-link">
+                <Link href="/signup" className="signup-link">
                   Sign Up
-                </a>
+                </Link>
               </div>
 
               {/* Button Section */}

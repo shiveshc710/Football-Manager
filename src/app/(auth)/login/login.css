@@ -25,19 +25,7 @@
 .button {
   @apply p-2 bg-gray-950 text-white rounded-lg hover:bg-black focus:outline-none focus:ring focus:ring-blue-300;
 }
-/* 
-.box-section {
-  @apply border-4 p-7 border-black rounded-lg;
-} */
-
-.video-section {
-  @apply absolute top-0 left-0 w-full h-full z-0;
-}
-
-.video-player {
-  @apply object-cover w-full h-full;
-}
 
 .signup-link {
-  @apply underline focus:bg-slate-600 focus:text-white focus:rounded-lg hover:font-extrabold;
+  @apply underline focus:bg-slate-600 focus:text-white focus:rounded-lg;
 }
