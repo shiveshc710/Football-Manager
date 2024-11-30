@@ -6,10 +6,20 @@ import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import "./signup.css";
+import Head from "next/head";
+import { SignUpAPI } from "@/utils/signupapi";
 
 export default function Signup() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+  const [userDetails, setUserDetails] = useState({
+    name: "",
+    lastName: "",
+    email: "",
+    password: "",
+    dob: "",
+    phoneNumber: "",
+  });
 
   const toggleVisibility = () => {
     setPasswordVisible(!passwordVisible);
@@ -19,8 +29,40 @@ export default function Signup() {
     setConfirmPasswordVisible(!confirmPasswordVisible);
   };
 
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setUserDetails({
+      ...userDetails,
+      [name]: value,
+    });
+  };
+
+  const handleSignup = async () => {
+    console.log(userDetails);
+    const response = await SignUpAPI(
+      userDetails.email,
+      userDetails.password,
+      userDetails.dob,
+      userDetails.name,
+      userDetails.lastName,
+      userDetails.phoneNumber
+    );
+
+    if (response.status == 200) {
+      console.log(response.status);
+      alert("Signup Successful");
+    } else {
+      console.log(response.status);
+      alert("Signup Failed");
+    }
+
+    console.log(response);
+  };
   return (
     <>
+      <Head>
+        <title>Football Manager | Sign Up</title>
+      </Head>
       <div className="signup-background">
         <LoginBackground />
 
@@ -28,14 +70,17 @@ export default function Signup() {
           <h1 className="fm-heading">Football Manager</h1>
           <div className="box-section">
             <h2 className="login-heading">Sign Up</h2>
-            <form className="login-form">
+            <form className="login-form" onSubmit={(e) => e.preventDefault()}>
               {/* Email Section  */}
               <div className="login-row">
                 <label className="w-36">Email:</label>
                 <input
                   type="email"
+                  name="email"
+                  value={userDetails.email}
                   className="login-input"
                   placeholder="Enter your Email"
+                  onChange={handleFormChange}
                   required
                 />
               </div>
@@ -45,8 +90,11 @@ export default function Signup() {
                 <label className="w-36">Name:</label>
                 <input
                   type="text"
+                  name="name"
+                  value={userDetails.name}
                   className="login-input"
                   placeholder="Enter your Name"
+                  onChange={handleFormChange}
                   required
                 />
               </div>
@@ -55,7 +103,10 @@ export default function Signup() {
                 <label className="w-36">Last Name:</label>
                 <input
                   type="text"
+                  name="lastName"
+                  value={userDetails.lastName}
                   className="login-input"
+                  onChange={handleFormChange}
                   placeholder="Enter your Last Name"
                   required
                 />
@@ -64,7 +115,14 @@ export default function Signup() {
               {/* DOB Section */}
               <div className="login-row">
                 <label className="w-36">DOB:</label>
-                <input type="date" className="login-input" required />
+                <input
+                  type="date"
+                  name="dob"
+                  value={userDetails.dob}
+                  onChange={handleFormChange}
+                  className="login-input"
+                  required
+                />
               </div>
 
               {/* Phone Number Section */}
@@ -72,7 +130,10 @@ export default function Signup() {
                 <label className="w-36">Phone Number:</label>
                 <input
                   type="text"
+                  name="phoneNumber"
                   className="login-input"
+                  value={userDetails.phoneNumber}
+                  onChange={handleFormChange}
                   placeholder="Enter your Phone Number"
                   pattern="\d{10}"
                   title="Phone number must be 10 digits"
@@ -93,7 +154,10 @@ export default function Signup() {
                 <label className="w-36">Password:</label>
                 <input
                   type={passwordVisible ? "text" : "password"}
+                  name="password"
                   className="login-input"
+                  value={userDetails.password}
+                  onChange={handleFormChange}
                   placeholder="Enter your Password"
                   required
                 />
@@ -132,7 +196,9 @@ export default function Signup() {
                 </Link>
               </div>
               {/* Button Section */}
-              <button className="button">Sign Up</button>
+              <button className="button" onClick={handleSignup}>
+                Sign Up
+              </button>
             </form>
           </div>
         </div>

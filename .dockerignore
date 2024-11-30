@@ -1,0 +1,31 @@
+# Ignore node_modules directory (because it's recreated during `npm install`)
+node_modules
+
+# Ignore .env files (you might want to specify environment variables via Dockerfile or Docker Compose)
+.env
+
+# Ignore Next.js build and cache folders
+.next
+out
+
+# Ignore test or debug files and directories
+*.log
+*.test.js
+*.spec.js
+
+# Ignore local development configuration files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore other unwanted files
+.DS_Store
+*.tgz
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Ignore Docker-specific files if you have them
+Dockerfile*
+.dockerignore

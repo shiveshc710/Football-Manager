@@ -36,7 +36,9 @@ export default function Login() {
 
               {/* Sign Up Section */}
               <div className="login-row">
-                <label className="w-55 mr-40">Don't have an account?</label>
+                <label className="w-55 mr-40">
+                  Don&apos;t have an account?
+                </label>
                 <Link href="/signup" className="signup-link">
                   Sign Up
                 </Link>

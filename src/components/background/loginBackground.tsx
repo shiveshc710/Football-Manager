@@ -1,6 +1,6 @@
 import { VIDEO_URLS } from "../../app/constantURLs";
 import "../../app/globals.css";
-import "./LoginBackground.css";
+import "./loginBackground.css";
 
 export default function LoginBackground() {
   return (
