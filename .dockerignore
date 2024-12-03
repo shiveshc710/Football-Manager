@@ -2,7 +2,7 @@
 node_modules
 
 # Ignore .env files (you might want to specify environment variables via Dockerfile or Docker Compose)
-.env
+.env.local
 
 # Ignore Next.js build and cache folders
 .next

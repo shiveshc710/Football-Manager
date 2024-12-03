@@ -5,13 +5,16 @@ FROM node:22 AS builder
 WORKDIR /app
 
 # Copy package.json and package-lock.json (or yarn.lock) first to leverage Docker cache for dependencies
-COPY package*.json ./
+COPY package*.json ./ 
 
 # Install dependencies
 RUN npm install
 
 # Copy the rest of the application files
 COPY . .
+
+# Copy the .env file into the container (for runtime)
+COPY .env ./
 
 # Build the Next.js app for production
 RUN npm run build

@@ -1,6 +1,8 @@
 import axios from "axios";
 import { API_URLS } from "@/app/constantURLs";
 
+export const dynamic = "force-dynamic";
+
 export const SignUpAPI = async (
   emailId: string,
   password: string,

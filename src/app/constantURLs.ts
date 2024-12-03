@@ -1,5 +1,6 @@
-export const BASE_URL =
-  process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8081";
+export const dynamic = "force-dynamic";
+
+export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 export const VIDEO_URLS = {
   backgroundVideo: "/Intro-Video.mp4",

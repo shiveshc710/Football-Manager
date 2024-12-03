@@ -4,10 +4,14 @@ import LoginBackground from "@/components/background/loginBackground";
 import "../login/login.css";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./signup.css";
 import Head from "next/head";
-import { SignUpAPI } from "@/utils/signupapi";
+import { SignUpAPI } from "@/utils/api/signupapi";
+import AlertVariousStates from "@/components/Alert/alert";
+import { MotionButton, MotionDiv } from "@/utils/motionFrame/motion";
+
+export const dynamic = "force-dynamic";
 
 export default function Signup() {
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -20,6 +24,19 @@ export default function Signup() {
     dob: "",
     phoneNumber: "",
   });
+  const [buttonDisabled, setButtonDisabled] = useState(true);
+  const [passwordConfig, setPasswordConfig] = useState({
+    confirmPassword: "",
+    passwordMatch: true,
+    passwordHidden: true,
+  });
+  const [alert, setAlert] = useState({
+    alertName: "",
+    alertMessage: "",
+  });
+
+  const [signupTriggered, setSignupTriggered] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleVisibility = () => {
     setPasswordVisible(!passwordVisible);
@@ -35,29 +52,90 @@ export default function Signup() {
       ...userDetails,
       [name]: value,
     });
-  };
 
-  const handleSignup = async () => {
-    console.log(userDetails);
-    const response = await SignUpAPI(
-      userDetails.email,
-      userDetails.password,
-      userDetails.dob,
-      userDetails.name,
-      userDetails.lastName,
-      userDetails.phoneNumber
-    );
-
-    if (response.status == 200) {
-      console.log(response.status);
-      alert("Signup Successful");
-    } else {
-      console.log(response.status);
-      alert("Signup Failed");
+    if (name === "confirmPassword") {
+      setPasswordConfig({
+        ...passwordConfig,
+        [name]: value,
+        passwordMatch: value === userDetails.password,
+        passwordHidden: false,
+      });
     }
-
-    console.log(response);
+    if (name === "password") {
+      setPasswordConfig({
+        ...passwordConfig,
+        passwordMatch: value === passwordConfig.confirmPassword,
+        passwordHidden: false,
+      });
+    }
   };
+
+  const handleSignup = () => {
+    setSignupTriggered(true);
+  };
+
+  useEffect(() => {
+    const signUp = async () => {
+      if (!signupTriggered) return;
+
+      try {
+        setIsLoading(true);
+        setButtonDisabled(true);
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        const response = await SignUpAPI(
+          userDetails.email,
+          userDetails.password,
+          userDetails.dob,
+          userDetails.name,
+          userDetails.lastName,
+          userDetails.phoneNumber
+        );
+
+        if (response && response.status === 200) {
+          setAlert({
+            alertName: "Success",
+            alertMessage: "Account Created Successfully",
+          });
+        } else {
+          console.log(response.status);
+        }
+      } catch (error) {
+        setAlert({
+          alertName: "Error",
+          alertMessage: "Account Creation Failed",
+        });
+        console.log(error);
+      } finally {
+        setTimeout(() => {
+          setAlert({
+            alertName: "",
+            alertMessage: "",
+          });
+        }, 5000);
+
+        setButtonDisabled(false);
+        setSignupTriggered(false);
+        setIsLoading(false);
+      }
+    };
+
+    if (
+      userDetails.email &&
+      userDetails.password &&
+      userDetails.dob &&
+      userDetails.name &&
+      userDetails.lastName &&
+      userDetails.phoneNumber
+    ) {
+      setButtonDisabled(false);
+    } else {
+      setButtonDisabled(true);
+    }
+    signUp();
+  }, [signupTriggered, userDetails]);
+
   return (
     <>
       <Head>
@@ -66,10 +144,16 @@ export default function Signup() {
       <div className="signup-background">
         <LoginBackground />
 
-        <div className="login-container">
+        <MotionDiv className="login-container">
           <h1 className="fm-heading">Football Manager</h1>
           <div className="box-section">
             <h2 className="login-heading">Sign Up</h2>
+            {alert.alertName && (
+              <AlertVariousStates
+                name={alert.alertName}
+                message={alert.alertMessage}
+              />
+            )}
             <form className="login-form" onSubmit={(e) => e.preventDefault()}>
               {/* Email Section  */}
               <div className="login-row">
@@ -98,6 +182,7 @@ export default function Signup() {
                   required
                 />
               </div>
+
               {/* Last Name Section */}
               <div className="login-row">
                 <label className="w-36">Last Name:</label>
@@ -175,8 +260,11 @@ export default function Signup() {
                 <label className="w-36">Confirm Password:</label>
                 <input
                   type={confirmPasswordVisible ? "text" : "password"}
+                  name="confirmPassword"
+                  value={passwordConfig.confirmPassword}
                   className="login-input"
                   placeholder="Confirm your Password"
+                  onChange={handleFormChange}
                   required
                 />
                 <button
@@ -188,6 +276,21 @@ export default function Signup() {
                 </button>
               </div>
 
+              <div className="login-row">
+                {passwordConfig.passwordMatch ? (
+                  <span
+                    className="text-green-500 ml-40 text-sm"
+                    hidden={passwordConfig.passwordHidden}
+                  >
+                    Passwords match
+                  </span>
+                ) : (
+                  <span className="text-red-500 ml-40 text-sm">
+                    Passwords do not match
+                  </span>
+                )}
+              </div>
+
               {/* Link Section */}
               <div className="login-row">
                 <p className="mt-5 mr-40">Already have an account?</p>
@@ -195,13 +298,18 @@ export default function Signup() {
                   Sign In
                 </Link>
               </div>
+
               {/* Button Section */}
-              <button className="button" onClick={handleSignup}>
+              <MotionButton
+                isLoading={isLoading}
+                onClick={handleSignup}
+                disabled={buttonDisabled}
+              >
                 Sign Up
-              </button>
+              </MotionButton>
             </form>
           </div>
-        </div>
+        </MotionDiv>
       </div>
     </>
   );

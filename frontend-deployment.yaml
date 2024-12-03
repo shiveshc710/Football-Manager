@@ -19,12 +19,9 @@ spec:
           image: shiveshc710/football-manager:frontend
           ports:
             - containerPort: 3000
-          env:
-            - name: NEXT_PUBLIC_BASE_URL
-              valueFrom:
-                configMapKeyRef:
-                  name: app-config
-                  key: NEXT_PUBLIC_BASE_URL
+          envFrom:
+            - configMapRef:
+                name: app-config
           resources:
             limits:
               memory: "512Mi"

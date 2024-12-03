@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: app-config
 data:
-  NEXT_PUBLIC_BASE_URL: "http://fmprod.example.com"
+  NEXT_PUBLIC_BASE_URL: "http://signup-service:8080"
