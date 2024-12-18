@@ -4,14 +4,15 @@ import LoginBackground from "@/components/background/loginBackground";
 import "../login/login.css";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import "./signup.css";
 import Head from "next/head";
 import { SignUpAPI } from "@/utils/api/signupapi";
-import AlertVariousStates from "@/components/Alert/alert";
 import { MotionButton, MotionDiv } from "@/utils/motionFrame/motion";
 
 export const dynamic = "force-dynamic";
+
+const Alert = lazy(() => import("@/components/Alert/alert"));
 
 export default function Signup() {
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -149,10 +150,9 @@ export default function Signup() {
           <div className="box-section">
             <h2 className="login-heading">Sign Up</h2>
             {alert.alertName && (
-              <AlertVariousStates
-                name={alert.alertName}
-                message={alert.alertMessage}
-              />
+              <Suspense>
+                <Alert name={alert.alertName} message={alert.alertMessage} />
+              </Suspense>
             )}
             <form className="login-form" onSubmit={(e) => e.preventDefault()}>
               {/* Email Section  */}

@@ -3,7 +3,7 @@ import "./login.css";
 import "../../globals.css";
 import Link from "next/link";
 import LoginBackground from "../../../components/background/loginBackground";
-import { motion } from "framer-motion";
+import { MotionButton, MotionDiv } from "@/utils/motionFrame/motion";
 
 export default function Login() {
   return (
@@ -11,15 +11,7 @@ export default function Login() {
       <div className="login-background">
         <LoginBackground />
 
-        <motion.div
-          className="login-container"
-          initial={{ opacity: 0, y: -100 }}
-          animate={{
-            opacity: 0.85,
-            y: 0,
-          }}
-          transition={{ ease: ["easeIn", "easeOut"], duration: 2 }}
-        >
+        <MotionDiv className="login-container">
           <h1 className="fm-heading">Football Manager</h1>
           <div className="box-section">
             <h2 className="login-heading">Sign In</h2>
@@ -55,21 +47,16 @@ export default function Login() {
               </div>
 
               {/* Button Section */}
-              <motion.button
-                type="submit"
-                className="button"
-                initial={{ opacity: 0 }}
-                animate={{
-                  opacity: 1,
-                  transition: { ease: ["easeIn", "easeOut"], duration: 2.5 },
-                }}
-                whileHover={{ scale: 1.1, transition: { duration: 0.2 } }}
+              <MotionButton
+                onClick={() => {}}
+                disabled={false}
+                isLoading={false}
               >
                 Login
-              </motion.button>
+              </MotionButton>
             </form>
           </div>
-        </motion.div>
+        </MotionDiv>
       </div>
     </>
   );
