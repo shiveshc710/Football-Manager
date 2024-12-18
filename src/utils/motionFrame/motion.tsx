@@ -1,26 +1,28 @@
 import { motion } from "framer-motion";
 import { Circles } from "react-loader-spinner";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import "./motion.css";
 
 // Motion Div Component
 export const MotionDiv = ({ ...props }) => {
-  return (
-    <motion.div
-      initial={{ x: 100, opacity: 0 }}
-      animate={{ x: 0, opacity: 0.85 }}
-      exit={{
+  const animationProps = useMemo(
+    () => ({
+      initial: { x: 100, opacity: 0 },
+      animate: { x: 0, opacity: 0.85 },
+      exit: {
         x: -100,
         opacity: 0,
         transition: { type: "spring", duration: 0.5 },
-      }}
-      transition={{ ease: ["easeIn", "easeOut"], duration: 0.5 }}
-      {...props}
-    />
+      },
+      transition: { ease: ["easeIn", "easeOut"], duration: 0.5 },
+    }),
+    []
   );
+
+  return <motion.div {...animationProps} {...props} />;
 };
 
-interface MotionButtionProps {
+interface MotionButtonProps {
   isLoading: boolean;
   onClick: () => void;
   disabled: boolean;
@@ -33,7 +35,7 @@ export const MotionButton = ({
   onClick,
   disabled,
   ...props
-}: MotionButtionProps) => {
+}: MotionButtonProps) => {
   const [loading, setLoading] = useState(isLoading);
   const [disabledInside, setDisabledInside] = useState(disabled);
 
@@ -42,39 +44,42 @@ export const MotionButton = ({
     setDisabledInside(disabled);
   }, [isLoading, disabled]);
 
-  const handleClick = async () => {
+  const handleClick = useCallback(async () => {
     setLoading(true);
     if (onClick) {
       await onClick();
     }
     setLoading(false);
-  };
+  }, [onClick]);
+
+  const buttonAnimationProps = useMemo(
+    () => ({
+      initial: { opacity: 0 },
+      animate: {
+        opacity: disabled ? 0.5 : 1,
+        transition: { ease: ["easeIn", "easeOut"], duration: 2.0 },
+      },
+      whileHover: !disabledInside
+        ? {
+            scale: 1.1,
+            transition: { duration: 0.2 },
+          }
+        : undefined,
+      whileTap: !disabledInside
+        ? {
+            scale: 0.9,
+            transition: { duration: 0.2 },
+          }
+        : undefined,
+    }),
+    [disabledInside, disabled]
+  );
 
   return (
     <motion.button
       className="button"
-      initial={{ opacity: 0 }}
+      {...buttonAnimationProps}
       disabled={disabledInside}
-      animate={{
-        opacity: disabled ? 0.5 : 1,
-        transition: { ease: ["easeIn", "easeOut"], duration: 2.0 },
-      }}
-      whileHover={
-        !disabledInside
-          ? {
-              scale: 1.1,
-              transition: { duration: 0.2 },
-            }
-          : undefined
-      }
-      whileTap={
-        !disabledInside
-          ? {
-              scale: 0.9,
-              transition: { duration: 0.2 },
-            }
-          : undefined
-      }
       onClick={handleClick}
       {...props}
     >
