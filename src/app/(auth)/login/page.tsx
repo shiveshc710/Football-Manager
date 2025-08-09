@@ -1,63 +1,87 @@
 "use client";
-import "./login.css";
-import "../../globals.css";
+
+import { useState } from "react";
 import Link from "next/link";
-import LoginBackground from "../../../components/background/loginBackground";
-import { MotionButton, MotionDiv } from "@/utils/motionFrame/motion";
+import EmailIcon from "@mui/icons-material/Email";
+import LockIcon from "@mui/icons-material/Lock";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { TextField, InputAdornment, IconButton } from "@mui/material";
+
+import "./login.css";
 
 export default function Login() {
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
-    <>
-      <div className="login-background">
-        <LoginBackground />
+    <div className="login-container">
+      <h1 className="fm-heading">Football Manager</h1>
+      <h2 className="login-heading">Sign In</h2>
 
-        <MotionDiv className="login-container">
-          <h1 className="fm-heading">Football Manager</h1>
-          <div className="box-section">
-            <h2 className="login-heading">Sign In</h2>
-            <form className="login-form">
-              {/* Email Section  */}
-              <div className="login-row">
-                <label className="w-36">Email:</label>
-                <input
-                  type="email"
-                  className="login-input"
-                  placeholder="Enter your Email"
-                />
-              </div>
+      <form className="login-form" onSubmit={(e) => e.preventDefault()}>
+        <TextField
+          className="text-field"
+          variant="filled"
+          label="Email"
+          type="email"
+          required
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <EmailIcon className="icon" />
+              </InputAdornment>
+            ),
+          }}
+          sx={{
+            input: { color: "white" },
+            label: { color: "white" },
+            "& .MuiFilledInput-root": { color: "white" },
+          }}
+        />
 
-              {/* Password Section */}
-              <div className="login-row">
-                <label className="w-36">Password:</label>
-                <input
-                  type="password"
-                  className="login-input"
-                  placeholder="Enter your Password"
-                />
-              </div>
+        <TextField
+          className="text-field"
+          variant="filled"
+          label="Password"
+          type={showPassword ? "text" : "password"}
+          required
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <LockIcon className="icon" />
+              </InputAdornment>
+            ),
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={() => setShowPassword(!showPassword)}
+                  edge="end"
+                  className="icon-button"
+                  aria-label="toggle password visibility"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+          sx={{
+            input: { color: "white" },
+            label: { color: "white" },
+            "& .MuiFilledInput-root": { color: "white" },
+          }}
+        />
 
-              {/* Sign Up Section */}
-              <div className="login-row">
-                <label className="w-55 mr-40">
-                  Don&apos;t have an account?
-                </label>
-                <Link href="/signup" className="signup-link">
-                  Sign Up
-                </Link>
-              </div>
+        <div className="sign-up-row">
+          <span className="sign-up-text">Don't have an account?</span>
+          <Link href="/signup" legacyBehavior>
+            <a className="sign-up-link">Sign Up</a>
+          </Link>
+        </div>
 
-              {/* Button Section */}
-              <MotionButton
-                onClick={() => {}}
-                disabled={false}
-                isLoading={false}
-              >
-                Login
-              </MotionButton>
-            </form>
-          </div>
-        </MotionDiv>
-      </div>
-    </>
+        <button type="submit" className="login-button">
+          Login
+        </button>
+      </form>
+    </div>
   );
 }

@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Root colors */
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -14,32 +15,46 @@
   }
 }
 
+/* Body base styles */
 body {
   color: var(--foreground);
-  background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: none; /* remove default background to show page-background */
 }
 
-.login-background {
-  --foreground: #141111;
-  --background: #e2e2e2;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+/* Global page background with football field and overlay */
+.page-background {
+  position: relative;
   min-height: 100vh;
+
+  /* Football field background */
+  background-image: url("/football-field.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 1rem;
 }
 
-.signup-background {
-  --foreground: #141111;
-  --background: #e2e2e2;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Overlay for better readability */
+.page-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* semi-transparent black */
+  z-index: 0;
+}
+
+/* Make sure direct children (your pages) are above overlay */
+.page-background > * {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 42rem; /* adjust max-width as needed */
+  margin: 0 auto;
 }
