@@ -1,0 +1,64 @@
+/* signup.css */
+
+/* Glassmorphism container */
+.signup-container {
+  @apply relative max-w-xl w-full p-8 rounded-2xl bg-white/15 backdrop-blur-lg shadow-lg text-white text-center font-sans;
+}
+
+/* Headings */
+.fm-heading {
+  @apply text-4xl font-extrabold mb-6 font-mono drop-shadow-lg;
+}
+
+.login-heading {
+  @apply text-3xl font-bold mb-8 drop-shadow-lg;
+}
+
+/* Form layout */
+.login-form {
+  @apply flex flex-col space-y-6;
+}
+
+/* Rows */
+.login-row {
+  @apply flex items-center space-x-4 relative;
+}
+
+/* Labels */
+.label {
+  @apply w-36 font-semibold text-white select-none;
+}
+
+/* Inputs */
+.login-input {
+  @apply flex-1 p-2 rounded-lg bg-white/25 text-white placeholder-white/75 focus:outline-none focus:ring-2 focus:ring-sky-400;
+}
+
+/* Eye toggle button - positioned inside relative parent */
+.eye-button {
+  @apply absolute right-3 top-1/2 -translate-y-1/2 text-white cursor-pointer;
+}
+
+/* Link section */
+.signup-link {
+  @apply text-sky-400 underline hover:text-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-400 rounded;
+}
+
+/* Password match text */
+.text-green-5001 {
+  @apply text-green-500;
+}
+
+.text-red-5001 {
+  @apply text-red-500;
+}
+
+/* Login button */
+.login-button {
+  @apply bg-gradient-to-r from-sky-500 to-sky-400 text-white font-bold py-3 rounded-xl shadow-lg hover:from-sky-600 hover:to-sky-500 transition-colors duration-300;
+  cursor: pointer;
+}
+
+.login-button:disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
