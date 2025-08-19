@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
         - name: nextjs-app
-          image: shiveshc710/football-manager:frontend
+          image: shiveshc710/football-manager:frontend-v2
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
           envFrom:

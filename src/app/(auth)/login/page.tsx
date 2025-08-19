@@ -72,7 +72,7 @@ export default function Login() {
         />
 
         <div className="sign-up-row">
-          <span className="sign-up-text">Don't have an account?</span>
+          <span className="sign-up-text">Don&apos;t have an account?</span>
           <Link href="/signup" legacyBehavior>
             <a className="sign-up-link">Sign Up</a>
           </Link>

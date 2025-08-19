@@ -6,7 +6,7 @@ interface MuiIconProps extends IconProps {
 }
 
 export const MuiIcon = ({ name, ...props }: MuiIconProps) => {
-  const Icon = Icons[name];
+  const Icon = (Icons as Record<string, React.ElementType>)[name];
   if (!Icon) return null;
-  return <Icon {...props}>{name}</Icon>;
+  return <Icon {...props} />;
 };
