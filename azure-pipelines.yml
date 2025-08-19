@@ -1,6 +1,5 @@
-# Docker
-# Build and push an image to Azure Container Registry
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+# Docker + AKS Deployment
+# Build and push an image to Azure Container Registry, then deploy to AKS
 
 trigger:
 - main
@@ -19,9 +18,13 @@ variables:
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
 
+  # AKS service connection
+  aksServiceConnection: '<your-aks-service-connection-name>'
+  namespace: 'default'
+
 stages:
-- stage: Build
-  displayName: Build and push stage
+- stage: BuildAndPush
+  displayName: Build and Push Docker Image
   jobs:
   - job: Build
     displayName: Build
@@ -37,3 +40,24 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
+
+- stage: DeployToAKS
+  displayName: Deploy to AKS
+  dependsOn: BuildAndPush
+  jobs:
+  - job: Deploy
+    displayName: Deploy
+    pool:
+      name: Default
+    steps:
+    - task: KubernetesManifest@1
+      displayName: Deploy frontend to AKS
+      inputs:
+        action: deploy
+        kubernetesServiceConnection: $(aksServiceConnection)
+        namespace: $(namespace)
+        manifests: |
+          $(Build.SourcesDirectory)/frontend-deployment-az.yaml
+          $(Build.SourcesDirectory)/frontend-service.yaml
+        containers: |
+          fmregistry123.azurecr.io/shiveshcfootballmanager:$(tag)
