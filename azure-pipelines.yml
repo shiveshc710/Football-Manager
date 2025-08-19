@@ -19,7 +19,7 @@ variables:
   vmImageName: 'ubuntu-latest'
 
   # AKS service connection
-  aksServiceConnection: '<your-aks-service-connection-name>'
+  aksServiceConnection: 'aks-connection'
   namespace: 'default'
 
 stages:
