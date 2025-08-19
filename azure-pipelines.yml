@@ -1,6 +1,3 @@
-# Docker + AKS Deployment
-# Build and push an image to Azure Container Registry, then deploy to AKS
-
 trigger:
 - main
 
@@ -8,18 +5,16 @@ resources:
 - repo: self
 
 variables:
-  # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: 'c63dff65-153d-4bc6-8f65-55cf498bf638'
   imageRepository: 'shiveshcfootballmanager'
   containerRegistry: 'fmregistry123.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
 
-  # Agent VM image name
   vmImageName: 'ubuntu-latest'
-
-  # AKS service connection
-  aksServiceConnection: 'aks-connection'
+  aksServiceConnection: 'aks-connection'  # Azure RM service connection
+  resourceGroup: 'Football-Manager'
+  aksClusterName: 'fm-cluster'
   namespace: 'default'
 
 stages:
@@ -50,14 +45,19 @@ stages:
     pool:
       name: Default
     steps:
-    - task: KubernetesManifest@1
+    - task: AzureCLI@2
       displayName: Deploy frontend to AKS
       inputs:
-        action: deploy
-        kubernetesServiceConnection: $(aksServiceConnection)
-        namespace: $(namespace)
-        manifests: |
-          $(Build.SourcesDirectory)/frontend-deployment-az.yaml
-          $(Build.SourcesDirectory)/frontend-service.yaml
-        containers: |
-          fmregistry123.azurecr.io/shiveshcfootballmanager:$(tag)
+        azureSubscription: $(aksServiceConnection)
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          # Get AKS credentials
+          az aks get-credentials --resource-group $(resourceGroup) --name $(aksClusterName) --overwrite-existing
+          
+          # Replace image tag dynamically in deployment YAML
+          sed -i "s|fmregistry123.azurecr.io/shiveshcfootballmanager:latest|fmregistry123.azurecr.io/shiveshcfootballmanager:$(tag)|g" $(Build.SourcesDirectory)/frontend-deployment-az.yaml
+          
+          # Apply deployment and service
+          kubectl apply -f $(Build.SourcesDirectory)/frontend-deployment-az.yaml
+          kubectl apply -f $(Build.SourcesDirectory)/frontend-service.yaml
