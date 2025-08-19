@@ -4,7 +4,7 @@ metadata:
   name: nextjs-app
 spec:
   selector:
-    app: nextjs-app
+    app: frontend
   ports:
     - protocol: TCP
       port: 3000
