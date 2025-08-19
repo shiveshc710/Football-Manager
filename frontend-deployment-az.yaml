@@ -16,5 +16,6 @@ spec:
         - name: frontend
           # Use placeholder tag; Azure DevOps will replace it
           image: fmregistry123.azurecr.io/shiveshcfootballmanager:REPLACE_TAG
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
