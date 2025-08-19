@@ -52,12 +52,14 @@ stages:
         scriptType: ps
         scriptLocation: inlineScript
         inlineScript: |
+          $deploymentFile = "$(Build.SourcesDirectory)\frontend-deployment-az.yaml"
+
           # Get AKS credentials
           az aks get-credentials --resource-group $(resourceGroup) --name $(aksClusterName) --overwrite-existing
-          
-          # Replace image tag dynamically in deployment YAML
-          (Get-Content "$(Build.SourcesDirectory)\frontend-deployment-az.yaml") -replace 'fmregistry123.azurecr.io/shiveshcfootballmanager:latest', "fmregistry123.azurecr.io/shiveshcfootballmanager:$(tag)" | Set-Content "$(Build.SourcesDirectory)\frontend-deployment-az.yaml"
-          
+
+          # Replace placeholder REPLACE_TAG with the current build tag
+          (Get-Content $deploymentFile) -replace 'fmregistry123.azurecr.io/shiveshcfootballmanager:REPLACE_TAG', "fmregistry123.azurecr.io/shiveshcfootballmanager:$(tag)" | Set-Content $deploymentFile
+
           # Apply deployment and service
-          kubectl apply -f "$(Build.SourcesDirectory)\frontend-deployment-az.yaml"
+          kubectl apply -f $deploymentFile
           kubectl apply -f "$(Build.SourcesDirectory)\frontend-service.yaml"
