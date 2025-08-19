@@ -49,15 +49,15 @@ stages:
       displayName: Deploy frontend to AKS
       inputs:
         azureSubscription: $(aksServiceConnection)
-        scriptType: bash
+        scriptType: ps
         scriptLocation: inlineScript
         inlineScript: |
           # Get AKS credentials
           az aks get-credentials --resource-group $(resourceGroup) --name $(aksClusterName) --overwrite-existing
           
           # Replace image tag dynamically in deployment YAML
-          sed -i "s|fmregistry123.azurecr.io/shiveshcfootballmanager:latest|fmregistry123.azurecr.io/shiveshcfootballmanager:$(tag)|g" $(Build.SourcesDirectory)/frontend-deployment-az.yaml
+          (Get-Content "$(Build.SourcesDirectory)\frontend-deployment-az.yaml") -replace 'fmregistry123.azurecr.io/shiveshcfootballmanager:latest', "fmregistry123.azurecr.io/shiveshcfootballmanager:$(tag)" | Set-Content "$(Build.SourcesDirectory)\frontend-deployment-az.yaml"
           
           # Apply deployment and service
-          kubectl apply -f $(Build.SourcesDirectory)/frontend-deployment-az.yaml
-          kubectl apply -f $(Build.SourcesDirectory)/frontend-service.yaml
+          kubectl apply -f "$(Build.SourcesDirectory)\frontend-deployment-az.yaml"
+          kubectl apply -f "$(Build.SourcesDirectory)\frontend-service.yaml"
