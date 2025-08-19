@@ -2,15 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  async redirects() {
-    return [
-      {
-        source: "/",
-        destination: "/login",
-        permanent: true,
-      },
-    ];
-  },
+  // No redirects - handled by middleware.ts
 };
 
 export default nextConfig;

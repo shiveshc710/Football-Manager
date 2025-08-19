@@ -1,38 +1,44 @@
-# Use an official Node.js runtime as a parent image
+# Stage 1: Build the app
 FROM node:22 AS builder
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json (or yarn.lock) first to leverage Docker cache for dependencies
-COPY package*.json ./ 
+# Declare build args you expect
+ARG NEXT_PUBLIC_BASE_URL
 
-# Install dependencies
-RUN npm install
+# Copy package.json files
+COPY package*.json ./
 
-# Copy the rest of the application files
+RUN npm ci
+
+# Copy rest of app files
 COPY . .
 
-# Copy the .env file into the container (for runtime)
-COPY .env ./
+# Set build-time environment variables for Next.js
+ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
 
-# Build the Next.js app for production
+# Run build with env vars available
 RUN npm run build
 
-# Use a smaller image for the production environment (optional but recommended)
+# Stage 2: Production image
 FROM node:22-slim
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy the built Next.js app from the builder stage
-COPY --from=builder /app /app
+# Copy package.json files for production install
+COPY package*.json ./
 
-# Install dependencies for the production environment
-RUN npm install --production
+RUN npm ci --only=production
 
-# Expose the port that Next.js app will run on (default is 3000)
+# Copy built files from builder
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/next.config.ts ./next.config.ts
+COPY --from=builder /app/node_modules ./node_modules
+
+# # Set runtime environment variables (optional if needed at runtime)
+# ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
+
 EXPOSE 3000
 
-# Start the Next.js app in production mode
 CMD ["npm", "start"]
