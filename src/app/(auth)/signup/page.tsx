@@ -1,319 +1,469 @@
 "use client";
 
-import "../../../app/globals.css";
+import { useState } from "react";
 import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
-import { useState, useEffect, lazy, Suspense } from "react";
-import Head from "next/head";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import EmailIcon from "@mui/icons-material/Email";
+import LockIcon from "@mui/icons-material/Lock";
+import PersonIcon from "@mui/icons-material/Person";
+import PhoneIcon from "@mui/icons-material/Phone";
+import CakeIcon from "@mui/icons-material/Cake";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import SportsIcon from "@mui/icons-material/Sports";
+import { TextField, InputAdornment, IconButton } from "@mui/material";
 import { SignUpAPI } from "@/utils/api/signupapi";
 
 import "./signup.css";
 
-const Alert = lazy(() => import("@/components/Alert/alert"));
+// Zod validation schema
+const signupSchema = z
+  .object({
+    email: z
+      .string()
+      .min(1, "Email is required")
+      .email("Please enter a valid email address"),
+    name: z.string().min(1, "First name is required"),
+    lastName: z.string().min(1, "Last name is required"),
+    phoneNumber: z
+      .string()
+      .min(1, "Phone number is required")
+      .regex(/^\d{10}$/, "Phone number must be exactly 10 digits"),
+    dateOfBirth: z.string().min(1, "Date of birth is required"),
+    password: z
+      .string()
+      .min(1, "Password is required")
+      .min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
-export const dynamic = "force-dynamic";
+type SignupFormData = z.infer<typeof signupSchema>;
 
 export default function Signup() {
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-  const [userDetails, setUserDetails] = useState({
-    name: "",
-    lastName: "",
-    email: "",
-    password: "",
-    dob: "",
-    phoneNumber: "",
-  });
-  const [buttonDisabled, setButtonDisabled] = useState(true);
-  const [passwordConfig, setPasswordConfig] = useState({
-    confirmPassword: "",
-    passwordMatch: true,
-    passwordHidden: true,
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema),
+    mode: "onBlur",
   });
 
-  const [alert, setAlert] = useState({
-    alertName: "",
-    alertMessage: "",
-  });
+  const onSubmit = async (data: SignupFormData) => {
+    try {
+      console.log("Signup attempt:", data);
+      const response = await SignUpAPI(
+        data.email,
+        data.password,
+        data.dateOfBirth,
+        data.name,
+        data.lastName,
+        data.phoneNumber
+      );
 
-  const [signupTriggered, setSignupTriggered] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const toggleVisibility = () => {
-    setPasswordVisible(!passwordVisible);
-  };
-
-  const toggleConfirmVisibility = () => {
-    setConfirmPasswordVisible(!confirmPasswordVisible);
-  };
-
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setUserDetails({
-      ...userDetails,
-      [name]: value,
-    });
-
-    if (name === "confirmPassword") {
-      setPasswordConfig({
-        ...passwordConfig,
-        confirmPassword: value,
-        passwordMatch: value === userDetails.password,
-        passwordHidden: false,
-      });
-    }
-    if (name === "password") {
-      setPasswordConfig({
-        ...passwordConfig,
-        passwordMatch: value === passwordConfig.confirmPassword,
-        passwordHidden: false,
-      });
-    }
-  };
-
-  const handleSignup = () => {
-    setSignupTriggered(true);
-  };
-
-  useEffect(() => {
-    const signUp = async () => {
-      if (!signupTriggered) return;
-
-      try {
-        setIsLoading(true);
-        setButtonDisabled(true);
-
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        const response = await SignUpAPI(
-          userDetails.email,
-          userDetails.password,
-          userDetails.dob,
-          userDetails.name,
-          userDetails.lastName,
-          userDetails.phoneNumber
-        );
-
-        if (response && response.status === 200) {
-          setAlert({
-            alertName: "Success",
-            alertMessage: "Account Created Successfully",
-          });
-        } else {
-          setAlert({
-            alertName: "Error",
-            alertMessage: "Account Creation Failed",
-          });
-        }
-      } catch (error) {
-        setAlert({
-          alertName: "Error",
-          alertMessage: "Account Creation Failed",
-        });
-        console.log(error);
-      } finally {
-        setTimeout(() => {
-          setAlert({
-            alertName: "",
-            alertMessage: "",
-          });
-        }, 5000);
-
-        setButtonDisabled(false);
-        setSignupTriggered(false);
-        setIsLoading(false);
+      if (response && response.status === 200) {
+        console.log("Account created successfully!");
+        // TODO: Redirect to login or show success message
       }
-    };
-
-    if (
-      userDetails.email &&
-      userDetails.password &&
-      userDetails.dob &&
-      userDetails.name &&
-      userDetails.lastName &&
-      userDetails.phoneNumber
-    ) {
-      setButtonDisabled(false);
-    } else {
-      setButtonDisabled(true);
+    } catch (error) {
+      console.error("Signup failed:", error);
+      // TODO: Show error message
     }
-    signUp();
-  }, [signupTriggered, userDetails]);
+  };
 
   return (
-    <>
-      <Head>
-        <title>Football Manager | Sign Up</title>
-      </Head>
+    <div className="signup-wrapper">
       <div className="signup-container">
-        <h1 className="fm-heading">Football Manager</h1>
-        <h2 className="login-heading">Sign Up</h2>
-
-        {alert.alertName && (
-          <Suspense>
-            <Alert name={alert.alertName} message={alert.alertMessage} />
-          </Suspense>
-        )}
-
-        <form className="login-form" onSubmit={(e) => e.preventDefault()}>
-          {/* Email */}
-          <div className="login-row">
-            <label className="label">Email:</label>
-            <input
-              type="email"
-              name="email"
-              value={userDetails.email}
-              className="login-input"
-              placeholder="Enter your Email"
-              onChange={handleFormChange}
-              required
-            />
+        {/* Header with Football Icon */}
+        <div className="signup-header">
+          <div className="icon-wrapper">
+            <SportsIcon className="football-icon" />
           </div>
+          <h1 className="fm-heading">Football Manager</h1>
+          <p className="fm-subtitle">Create Your Account</p>
+        </div>
 
-          {/* Name */}
-          <div className="login-row">
-            <label className="label">Name:</label>
-            <input
+        <h2 className="signup-heading">Join the Team</h2>
+
+        <form className="signup-form" onSubmit={handleSubmit(onSubmit)}>
+          <div className="form-row">
+            <TextField
+              {...register("name")}
+              className="text-field"
+              variant="outlined"
+              label="First Name"
               type="text"
-              name="name"
-              value={userDetails.name}
-              className="login-input"
-              placeholder="Enter your Name"
-              onChange={handleFormChange}
-              required
+              fullWidth
+              error={!!errors.name}
+              helperText={errors.name?.message}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PersonIcon className="input-icon" />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "white",
+                  "& fieldset": {
+                    borderColor: errors.name ? "#ef4444" : "#d1d5db",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: errors.name ? "#ef4444" : "#9ca3af",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: errors.name ? "#ef4444" : "#1f2937",
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: errors.name ? "#ef4444" : "#6b7280",
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: errors.name ? "#ef4444" : "#1f2937",
+                },
+                "& .MuiFormHelperText-root": {
+                  color: "#ef4444",
+                  marginLeft: 0,
+                },
+              }}
             />
-          </div>
 
-          {/* Last Name */}
-          <div className="login-row">
-            <label className="label">Last Name:</label>
-            <input
+            <TextField
+              {...register("lastName")}
+              className="text-field"
+              variant="outlined"
+              label="Last Name"
               type="text"
-              name="lastName"
-              value={userDetails.lastName}
-              className="login-input"
-              placeholder="Enter your Last Name"
-              onChange={handleFormChange}
-              required
+              fullWidth
+              error={!!errors.lastName}
+              helperText={errors.lastName?.message}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PersonIcon className="input-icon" />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "white",
+                  "& fieldset": {
+                    borderColor: errors.lastName ? "#ef4444" : "#d1d5db",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: errors.lastName ? "#ef4444" : "#9ca3af",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: errors.lastName ? "#ef4444" : "#1f2937",
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: errors.lastName ? "#ef4444" : "#6b7280",
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: errors.lastName ? "#ef4444" : "#1f2937",
+                },
+                "& .MuiFormHelperText-root": {
+                  color: "#ef4444",
+                  marginLeft: 0,
+                },
+              }}
             />
           </div>
 
-          {/* DOB */}
-          <div className="login-row">
-            <label className="label">DOB:</label>
-            <input
+          <TextField
+            {...register("email")}
+            className="text-field"
+            variant="outlined"
+            label="Email Address"
+            type="email"
+            fullWidth
+            error={!!errors.email}
+            helperText={errors.email?.message}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <EmailIcon className="input-icon" />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                backgroundColor: "white",
+                "& fieldset": {
+                  borderColor: errors.email ? "#ef4444" : "#d1d5db",
+                },
+                "&:hover fieldset": {
+                  borderColor: errors.email ? "#ef4444" : "#9ca3af",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: errors.email ? "#ef4444" : "#1f2937",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                color: errors.email ? "#ef4444" : "#6b7280",
+              },
+              "& .MuiInputLabel-root.Mui-focused": {
+                color: errors.email ? "#ef4444" : "#1f2937",
+              },
+              "& .MuiFormHelperText-root": {
+                color: "#ef4444",
+                marginLeft: 0,
+              },
+            }}
+          />
+
+          <div className="form-row">
+            <TextField
+              {...register("phoneNumber")}
+              className="text-field"
+              variant="outlined"
+              label="Phone Number"
+              type="tel"
+              fullWidth
+              error={!!errors.phoneNumber}
+              helperText={errors.phoneNumber?.message}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PhoneIcon className="input-icon" />
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "white",
+                  "& fieldset": {
+                    borderColor: errors.phoneNumber ? "#ef4444" : "#d1d5db",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: errors.phoneNumber ? "#ef4444" : "#9ca3af",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: errors.phoneNumber ? "#ef4444" : "#1f2937",
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: errors.phoneNumber ? "#ef4444" : "#6b7280",
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: errors.phoneNumber ? "#ef4444" : "#1f2937",
+                },
+                "& .MuiFormHelperText-root": {
+                  color: "#ef4444",
+                  marginLeft: 0,
+                },
+              }}
+            />
+
+            <TextField
+              {...register("dateOfBirth")}
+              className="text-field"
+              variant="outlined"
+              label="Date of Birth"
               type="date"
-              name="dob"
-              value={userDetails.dob}
-              className="login-input"
-              onChange={handleFormChange}
-              required
-            />
-          </div>
-
-          {/* Phone Number */}
-          <div className="login-row">
-            <label className="label">Phone Number:</label>
-            <input
-              type="text"
-              name="phoneNumber"
-              className="login-input"
-              value={userDetails.phoneNumber}
-              onChange={handleFormChange}
-              placeholder="Enter your Phone Number"
-              pattern="\d{10}"
-              title="Phone number must be 10 digits"
-              onInvalid={(e) => {
-                const target = e.target as HTMLInputElement;
-                target.setCustomValidity("Phone number must be 10 digits");
+              fullWidth
+              error={!!errors.dateOfBirth}
+              helperText={errors.dateOfBirth?.message}
+              InputLabelProps={{
+                shrink: true,
               }}
-              onInput={(e) => {
-                const target = e.target as HTMLInputElement;
-                target.setCustomValidity("");
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <CakeIcon className="input-icon" />
+                  </InputAdornment>
+                ),
               }}
-              required
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  backgroundColor: "white",
+                  "& fieldset": {
+                    borderColor: errors.dateOfBirth ? "#ef4444" : "#d1d5db",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: errors.dateOfBirth ? "#ef4444" : "#9ca3af",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: errors.dateOfBirth ? "#ef4444" : "#1f2937",
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: errors.dateOfBirth ? "#ef4444" : "#6b7280",
+                },
+                "& .MuiInputLabel-root.Mui-focused": {
+                  color: errors.dateOfBirth ? "#ef4444" : "#1f2937",
+                },
+                "& .MuiFormHelperText-root": {
+                  color: "#ef4444",
+                  marginLeft: 0,
+                },
+              }}
             />
           </div>
 
-          {/* Password */}
-          <div className="login-row relative">
-            <label className="label">Password:</label>
-            <input
-              type={passwordVisible ? "text" : "password"}
-              name="password"
-              className="login-input pr-10"
-              value={userDetails.password}
-              onChange={handleFormChange}
-              placeholder="Enter your Password"
-              required
-            />
-            <button
-              type="button"
-              className="eye-button"
-              onClick={toggleVisibility}
-              aria-label="Toggle password visibility"
-            >
-              {passwordVisible ? <Eye /> : <EyeOff />}
-            </button>
-          </div>
+          <TextField
+            {...register("password")}
+            className="text-field"
+            variant="outlined"
+            label="Password"
+            type={showPassword ? "text" : "password"}
+            fullWidth
+            error={!!errors.password}
+            helperText={errors.password?.message}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockIcon className="input-icon" />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword(!showPassword)}
+                    edge="end"
+                    className="icon-button"
+                    aria-label="toggle password visibility"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? (
+                      <VisibilityOff className="input-icon" />
+                    ) : (
+                      <Visibility className="input-icon" />
+                    )}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                backgroundColor: "white",
+                "& fieldset": {
+                  borderColor: errors.password ? "#ef4444" : "#d1d5db",
+                },
+                "&:hover fieldset": {
+                  borderColor: errors.password ? "#ef4444" : "#9ca3af",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: errors.password ? "#ef4444" : "#1f2937",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                color: errors.password ? "#ef4444" : "#6b7280",
+              },
+              "& .MuiInputLabel-root.Mui-focused": {
+                color: errors.password ? "#ef4444" : "#1f2937",
+              },
+              "& .MuiFormHelperText-root": {
+                color: "#ef4444",
+                marginLeft: 0,
+              },
+            }}
+          />
 
-          {/* Confirm Password */}
-          <div className="login-row relative">
-            <label className="label">Confirm Password:</label>
-            <input
-              type={confirmPasswordVisible ? "text" : "password"}
-              name="confirmPassword"
-              value={passwordConfig.confirmPassword}
-              className="login-input pr-10"
-              placeholder="Confirm your Password"
-              onChange={handleFormChange}
-              required
-            />
-            <button
-              type="button"
-              className="eye-button"
-              onClick={toggleConfirmVisibility}
-              aria-label="Toggle confirm password visibility"
-            >
-              {confirmPasswordVisible ? <Eye /> : <EyeOff />}
-            </button>
-          </div>
+          <TextField
+            {...register("confirmPassword")}
+            className="text-field"
+            variant="outlined"
+            label="Confirm Password"
+            type={showConfirmPassword ? "text" : "password"}
+            fullWidth
+            error={!!errors.confirmPassword}
+            helperText={errors.confirmPassword?.message}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockIcon className="input-icon" />
+                </InputAdornment>
+              ),
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() =>
+                      setShowConfirmPassword(!showConfirmPassword)
+                    }
+                    edge="end"
+                    className="icon-button"
+                    aria-label="toggle confirm password visibility"
+                    tabIndex={-1}
+                  >
+                    {showConfirmPassword ? (
+                      <VisibilityOff className="input-icon" />
+                    ) : (
+                      <Visibility className="input-icon" />
+                    )}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                backgroundColor: "white",
+                "& fieldset": {
+                  borderColor: errors.confirmPassword ? "#ef4444" : "#d1d5db",
+                },
+                "&:hover fieldset": {
+                  borderColor: errors.confirmPassword ? "#ef4444" : "#9ca3af",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: errors.confirmPassword ? "#ef4444" : "#1f2937",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                color: errors.confirmPassword ? "#ef4444" : "#6b7280",
+              },
+              "& .MuiInputLabel-root.Mui-focused": {
+                color: errors.confirmPassword ? "#ef4444" : "#1f2937",
+              },
+              "& .MuiFormHelperText-root": {
+                color: "#ef4444",
+                marginLeft: 0,
+              },
+            }}
+          />
 
-          {/* Password match message */}
-          <div className="login-row">
-            {passwordConfig.passwordMatch ? (
-              <span
-                className="text-green-500 ml-[9rem] text-sm"
-                hidden={passwordConfig.passwordHidden}
-              >
-                Passwords match
-              </span>
-            ) : (
-              <span className="text-red-500 ml-[9rem] text-sm">
-                Passwords do not match
-              </span>
-            )}
-          </div>
-
-          {/* Link to Login */}
-          <div className="login-row">
-            <p className="mt-5 mr-[9rem]">Already have an account?</p>
-            <Link href="/login" legacyBehavior>
-              <a className="signup-link mt-5">Sign In</a>
-            </Link>
-          </div>
-
-          {/* Submit button */}
           <button
             type="submit"
-            className="login-button"
-            disabled={buttonDisabled || isLoading}
-            onClick={handleSignup}
+            className="signup-button"
+            disabled={isSubmitting}
           >
-            {isLoading ? "Signing Up..." : "Sign Up"}
+            <span className="button-text">
+              {isSubmitting ? "Creating Account..." : "Create Account"}
+            </span>
+            <div className="button-shine"></div>
           </button>
+
+          <div className="divider">
+            <span className="divider-line"></span>
+            <span className="divider-text">or</span>
+            <span className="divider-line"></span>
+          </div>
+
+          <div className="signin-row">
+            <span className="signin-text">Already have an account?</span>
+            <Link href="/login" legacyBehavior>
+              <a className="signin-link">Sign In</a>
+            </Link>
+          </div>
         </form>
+
+        {/* Decorative Elements */}
+        <div className="field-lines"></div>
       </div>
-    </>
+
+      {/* Background Decorations */}
+      <div className="bg-decoration bg-decoration-1"></div>
+      <div className="bg-decoration bg-decoration-2"></div>
+    </div>
   );
 }

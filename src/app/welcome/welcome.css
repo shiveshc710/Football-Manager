@@ -1,0 +1,217 @@
+/* Welcome Page Styling */
+
+.welcome-wrapper {
+    @apply flex items-center justify-center min-h-screen p-4;
+    background: transparent;
+}
+
+.loading {
+    @apply text-2xl font-bold;
+    color: #1f2937;
+}
+
+.welcome-container {
+    @apply relative max-w-3xl w-full p-10 rounded-3xl text-center font-sans;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.08),
+        0 4px 16px rgba(0, 0, 0, 0.04);
+    animation: slideIn 0.6s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header */
+.welcome-header {
+    @apply mb-8;
+}
+
+.icon-wrapper {
+    @apply inline-flex items-center justify-center w-24 h-24 rounded-full mb-4;
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+    }
+}
+
+.football-icon {
+    @apply text-white;
+    font-size: 3rem !important;
+}
+
+.welcome-title {
+    @apply text-4xl font-extrabold mb-2;
+    background: linear-gradient(135deg, #111827 0%, #374151 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.welcome-subtitle {
+    @apply text-xl font-medium;
+    color: #6b7280;
+}
+
+/* User Info Card */
+.user-info-card {
+    @apply bg-white rounded-2xl p-6 mb-6 text-left;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+    @apply text-2xl font-bold mb-6 text-center;
+    color: #1f2937;
+}
+
+.info-row {
+    @apply flex items-center gap-4 p-4 rounded-xl mb-3;
+    background: #f9fafb;
+    transition: all 0.3s ease;
+}
+
+.info-row:hover {
+    background: #f3f4f6;
+    transform: translateX(4px);
+}
+
+.info-icon {
+    @apply text-3xl;
+    color: #6b7280;
+}
+
+.info-content {
+    @apply flex flex-col flex-1;
+}
+
+.info-label {
+    @apply text-sm font-medium;
+    color: #9ca3af;
+}
+
+.info-value {
+    @apply text-lg font-semibold;
+    color: #1f2937;
+}
+
+.info-value.expiring {
+    @apply text-red-600;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Expiry Warning */
+.expiry-warning {
+    @apply bg-yellow-50 border-2 border-yellow-400 rounded-xl p-4 mb-6 text-yellow-800 font-medium;
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-10px);
+    }
+
+    75% {
+        transform: translateX(10px);
+    }
+}
+
+/* Actions */
+.actions {
+    @apply flex justify-center gap-4 mb-6;
+}
+
+.logout-button {
+    @apply flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.logout-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+}
+
+.logout-button:active {
+    transform: translateY(0);
+}
+
+.button-icon {
+    @apply text-xl;
+}
+
+/* Info Box */
+.info-box {
+    @apply bg-blue-50 border-2 border-blue-200 rounded-xl p-6 text-left;
+}
+
+.info-box-title {
+    @apply text-xl font-bold mb-3;
+    color: #1e40af;
+}
+
+.info-box-text {
+    @apply text-sm mb-2;
+    color: #1e3a8a;
+}
+
+.info-box-text:last-child {
+    @apply mb-0;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .welcome-container {
+        @apply p-6;
+    }
+
+    .welcome-title {
+        @apply text-3xl;
+    }
+
+    .welcome-subtitle {
+        @apply text-lg;
+    }
+}

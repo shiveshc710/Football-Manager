@@ -1,64 +1,236 @@
-/* signup.css */
+/* Modern Football-Themed Signup Page - Light Theme */
 
-/* Glassmorphism container */
+/* Wrapper with transparent background to show layout background */
+.signup-wrapper {
+  @apply flex items-center justify-center min-h-screen p-4 relative overflow-hidden;
+  background: transparent;
+}
+
+/* Subtle background decorative elements - hidden to show layout background */
+.bg-decoration {
+  @apply absolute rounded-full;
+  opacity: 0;
+  display: none;
+}
+
+/* Clean card container with subtle shadow */
 .signup-container {
-  @apply relative max-w-xl w-full p-8 rounded-2xl bg-white/15 backdrop-blur-lg shadow-lg text-white text-center font-sans;
+  @apply relative max-w-2xl w-full p-10 rounded-3xl text-center font-sans z-10;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.08),
+    0 4px 16px rgba(0, 0, 0, 0.04);
+  animation: slideIn 0.6s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header section */
+.signup-header {
+  @apply mb-8;
+}
+
+.icon-wrapper {
+  @apply inline-flex items-center justify-center w-20 h-20 rounded-full mb-4;
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.football-icon {
+  @apply text-white;
+  font-size: 2.5rem !important;
 }
 
 /* Headings */
 .fm-heading {
-  @apply text-4xl font-extrabold mb-6 font-mono drop-shadow-lg;
+  @apply text-4xl font-extrabold mb-2 font-mono;
+  background: linear-gradient(135deg, #111827 0%, #374151 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.login-heading {
-  @apply text-3xl font-bold mb-8 drop-shadow-lg;
+.fm-subtitle {
+  @apply text-sm font-medium tracking-wide;
+  color: #6b7280;
+}
+
+.signup-heading {
+  @apply text-2xl font-bold mb-8;
+  color: #1f2937;
 }
 
 /* Form layout */
-.login-form {
-  @apply flex flex-col space-y-6;
+.signup-form {
+  @apply flex flex-col space-y-5;
 }
 
-/* Rows */
-.login-row {
-  @apply flex items-center space-x-4 relative;
+/* Form row for side-by-side fields */
+.form-row {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-4;
 }
 
-/* Labels */
-.label {
-  @apply w-36 font-semibold text-white select-none;
+/* Input fields */
+.text-field {
+  @apply rounded-xl;
+  transition: all 0.3s ease;
 }
 
-/* Inputs */
-.login-input {
-  @apply flex-1 p-2 rounded-lg bg-white/25 text-white placeholder-white/75 focus:outline-none focus:ring-2 focus:ring-sky-400;
+.text-field:hover {
+  transform: translateY(-2px);
 }
 
-/* Eye toggle button - positioned inside relative parent */
-.eye-button {
-  @apply absolute right-3 top-1/2 -translate-y-1/2 text-white cursor-pointer;
+.input-icon {
+  color: #6b7280;
 }
 
-/* Link section */
-.signup-link {
-  @apply text-sky-400 underline hover:text-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-400 rounded;
+.icon-button {
+  color: #6b7280;
 }
 
-/* Password match text */
-.text-green-5001 {
-  @apply text-green-500;
+/* Signup button with black gradient */
+.signup-button {
+  @apply relative font-bold py-4 rounded-xl shadow-lg overflow-hidden;
+  background: linear-gradient(135deg, #111827 0%, #000000 100%) !important;
+  color: white !important;
+  transition: all 0.4s ease;
 }
 
-.text-red-5001 {
-  @apply text-red-500;
+.signup-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #000000 0%, #000000 100%) !important;
 }
 
-/* Login button */
-.login-button {
-  @apply bg-gradient-to-r from-sky-500 to-sky-400 text-white font-bold py-3 rounded-xl shadow-lg hover:from-sky-600 hover:to-sky-500 transition-colors duration-300;
-  cursor: pointer;
+.signup-button:active:not(:disabled) {
+  transform: translateY(0);
 }
 
-.login-button:disabled {
-  @apply opacity-50 cursor-not-allowed;
+.signup-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.button-text {
+  @apply relative z-10;
+}
+
+.button-shine {
+  @apply absolute inset-0 opacity-0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+/* Divider */
+.divider {
+  @apply flex items-center gap-4 my-2;
+}
+
+.divider-line {
+  @apply flex-1 h-px;
+  background: linear-gradient(to right, transparent, #d1d5db, transparent);
+}
+
+.divider-text {
+  @apply text-sm font-medium;
+  color: #9ca3af;
+}
+
+/* Sign in section */
+.signin-row {
+  @apply flex justify-center items-center gap-2 font-medium text-sm mt-2;
+  color: #6b7280;
+}
+
+.signin-text {
+  @apply select-none;
+}
+
+.signin-link {
+  @apply font-bold transition-all duration-300;
+  color: #1f2937;
+  text-decoration: none;
+  position: relative;
+}
+
+.signin-link::after {
+  content: '';
+  @apply absolute bottom-0 left-0 w-0 h-0.5;
+  background: #1f2937;
+  transition: width 0.3s ease;
+}
+
+.signin-link:hover::after {
+  @apply w-full;
+}
+
+/* Decorative field lines */
+.field-lines {
+  @apply absolute bottom-0 left-0 right-0 h-1 opacity-10;
+  background: repeating-linear-gradient(90deg,
+      transparent,
+      transparent 10px,
+      #9ca3af 10px,
+      #9ca3af 12px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .signup-container {
+    @apply p-6;
+  }
+
+  .fm-heading {
+    @apply text-3xl;
+  }
+
+  .signup-heading {
+    @apply text-xl;
+  }
+
+  .form-row {
+    @apply grid-cols-1;
+  }
 }
